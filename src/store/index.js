@@ -17,9 +17,9 @@ export default createStore({
       const data = await employees()
       context.commit('setEmployee', data)
     },
+    
     async despedir(context){
       var data = await employees()
-      data =data.splice(1, 1)
       console.log(data)
       context.commit('setEmployee', data)
       console.log('eliminados')

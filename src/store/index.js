@@ -1,15 +1,19 @@
 import { createStore } from 'vuex'
-import {employees} from '../services/Employees.js'
+import {employees, postAndPut, Delete, login, extra, prestaciones} from '../services/Employees.js'
 
 export default createStore({
   state: {
-    employees: []
+    employees: [],
+    isLogin: false
   },
   getters: {
   },
   mutations: {
     setEmployee(state, payload){
       state.employees = payload
+    },
+    setLogin(state){
+      state.isLogin = true
     }
   },
   actions: {
@@ -17,14 +21,23 @@ export default createStore({
       const data = await employees()
       context.commit('setEmployee', data)
     },
-    
-    async despedir(context){
-      var data = await employees()
-      console.log(data)
-      context.commit('setEmployee', data)
-      console.log('eliminados')
+    async postEmployee(context, payload){
+      console.log(await postAndPut(payload))
+    },
+    async DeleteEmployee(context, id){
+      console.log(await Delete(id))
+    },
+    async LoginEmployee(context, payload){
+      await login(payload);
+      context.commit('setLogin')
+    },
+    async extraEmployee(context, id, extras){
+      const resp = await extra(id, extras);
+      console.log('respuesta de la peticion', resp)
+    },
+    async prestaciones(context, id){
+      const resp = await prestaciones(id);
+      return resp
     }
   },
-  modules: {
-  }
 })

@@ -1,21 +1,28 @@
 <template>
-  <div>
-    <List />
-  </div>
+    <loginScreen />
+    <TableEmployee v-if="$store.state.isLogin"/>
+    <div v-else>
+      No estas autenticado, sorry
+    </div>
 </template>
 
 <script>
-import List from '@/components/List/List.vue'
+import TableEmployee from '../src/components/Table.vue'
+import loginScreen from '../src/components/Login.vue'
 
 export default {
 
   name: "App",
   components: {
-    List,
-
+    TableEmployee,
+    loginScreen
+  },
+  data(){
+    return{
+    }
   },
 };
-</script>
+</script> 
 
 <style>
 #app {
@@ -24,6 +31,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

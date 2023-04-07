@@ -1,8 +1,7 @@
 <template>
-    <loginScreen />
     <TableEmployee v-if="$store.state.isLogin"/>
     <div v-else>
-      No estas autenticado, sorry
+      <loginScreen />
     </div>
 </template>
 

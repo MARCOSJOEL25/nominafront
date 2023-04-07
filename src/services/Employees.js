@@ -83,7 +83,7 @@ export const login =  async ( payload ) => {
       .then(response => response.json())
       .catch(error => console.log('error', error));
     console.log(rel.statusCode)
-    return rel.statusCode == 200  
+    return rel.statusCode == 200
 } 
 
 export const prestaciones = async (id) => {

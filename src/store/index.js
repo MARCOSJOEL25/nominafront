@@ -28,8 +28,12 @@ export default createStore({
       console.log(await Delete(id))
     },
     async LoginEmployee(context, payload){
-      await login(payload);
-      context.commit('setLogin')
+      const resp = await login(payload);
+      if(resp){
+        context.commit('setLogin')
+        return true
+      } 
+        return false
     },
     async extraEmployee(context, id, extras){
       const resp = await extra(id, extras);

@@ -1,5 +1,5 @@
 <template>
-<nav class="navbar navbar-default navbar-expand-lg navbar-light">
+  <!-- <nav class="navbar navbar-default navbar-expand-lg navbar-light">
 	<div class="navbar-header">
 		<a class="navbar-brand" href="#">Lugo<b>Tech</b></a>  		
 		<button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle">
@@ -8,8 +8,8 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
-	</div>
-	<!-- Collection of nav links, forms, and other content for toggling -->
+	</div> -->
+  <!-- Collection of nav links, forms, and other content for toggling 
 	<div  v-if="!$store.state.isLogin" id="navbarCollapse" class="collapse navbar-collapse">
 		<form class="navbar-form form-inline">
 			<div class="input-group search-box">								
@@ -58,266 +58,139 @@
 			</li>
 		</ul>
 	</div>
-</nav>
+</nav> -->
+  <section class="">
+    <div v-if="isOpenAlert">
+      <v-alert type="error" title="Credenciales incorrectas" text=""></v-alert>
+    </div>
+    <div
+      class="px-4 py-5 px-md-5 text-center text-lg-start abs-center"
+      style="background-color: hsl(0, 0%, 96%)"
+    >
+      <div class="container">
+        <div class="row gx-lg-5 align-items-center">
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <h1 class="my-5 display-3 fw-bold ls-tight">
+              LugoTech <br />
+              <span class="text-primary"
+                >No solo es software, son tus ideas.</span
+              >
+            </h1>
+            <p style="color: hsl(217, 10%, 50.8%)">
+              Experto en soluciones tecnologicas
+            </p>
+          </div>
+
+          <div class="col-lg-6 mb-5 mb-lg-0">
+            <div class="card">
+              <div class="card-body py-5 px-md-5">
+                <h1 class="my-5 display-5 fw-bold ls-tight">Sign in</h1>
+                <!-- Email input -->
+                <div class="form-outline mb-4">
+                  <input type="email" id="form3Example3" class="form-control" v-model="loginModel.userName"/>
+                  <label class="form-label" for="form3Example3"
+                    >Email address</label
+                  >
+                </div>
+
+                <!-- Password input -->
+                <div class="form-outline mb-4">
+                  <input
+                    type="password"
+                    id="form3Example4"
+                    class="form-control"
+					v-model="loginModel.password"
+                  />
+                  <label class="form-label" for="form3Example4">Password</label>
+                </div>
+
+                <div class="text-center">
+                  <v-btn
+                    :disabled="dialog"
+                    :loading="dialog"
+                    color="purple-darken-2"
+                    @click="dialog = true"
+                  >
+                    Login
+                  </v-btn>
+                  <v-dialog
+                    v-model="dialog"
+                    :scrim="false"
+                    persistent
+                    width="auto"
+                  >
+                    <v-card color="primary">
+                      <v-card-text>
+                        ...loading
+                        <v-progress-linear
+                          indeterminate
+                          color="white"
+                          class="mb-0"
+                        ></v-progress-linear>
+                      </v-card-text>
+                    </v-card>
+                  </v-dialog>
+                </div>
+
+                <!-- <button class="btn btn-primary btn-block mb-4" :disabled="isLoading" @click="login">
+                  Sign up
+                </button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </template>
 <script>
-import { mapActions } from 'vuex'
+import { mapActions } from "vuex";
 export default {
-    name:'loginScreen',
-	data(){
-		return {
-			loginModel:{
-				"userName": "",
-				"password": ""
-			},
-			isLoading: false
-		}
-	},
-    methods:{
-        ...mapActions(['LoginEmployee']),
-		async login(){
-			this.isLoading = true
-			console.log(this.loginModel)
-			await this.LoginEmployee(this.loginModel);
-			this.isLoading = true
-		}
-    },
+  name: "loginScreen",
+  data() {
+    return {
+      loginModel: {
+        userName: "",
+        password: "",
+      },
+      isLoading: false,
+      isOpenAlert: false,
+      dialog: false,
+    };
+  },
+  methods: {
+    ...mapActions(["LoginEmployee"]),
+    async login() {
 
+		this.isLoading = true;
+		console.log(this.loginModel);
+      
+		await this.LoginEmployee(this.loginModel);
+		
+		this.isLoading = true;
+    },
+  },
+  watch: {
+    async dialog(val) {
+      if (!val) return;
 	
-}
+		if(!(await this.login(this.loginModel))){
+			this.isOpenAlert = true
+		}
+
+		this.dialog = false;
+    },
+  },
+};
 </script>
 
-
-
 <style>
-    body {
-		font-family: 'Varela Round', sans-serif;
-	}
-	.form-control {
-		box-shadow: none;		
-		font-weight: normal;
-		font-size: 13px;
-	}
-	.form-control:focus {
-		border-color: #33cabb;
-		box-shadow: 0 0 8px rgba(0,0,0,0.1);
-	}
-
-	.navbar {
-		background: #fff;
-		padding-left: 16px;
-		padding-right: 16px;
-		border-bottom: 1px solid #dfe3e8;
-		border-radius: 0;
-	}
-	.nav img {
-		border-radius: 50%;
-		width: 36px;
-		height: 36px;
-		margin: -8px 0;
-		float: left;
-		margin-right: 10px;
-	}
-	.navbar .navbar-brand, .navbar .navbar-brand:hover, .navbar .navbar-brand:focus {
-		padding-left: 0;
-		font-size: 20px;
-		padding-right: 50px;
-	}
-	.navbar .navbar-brand b {
-		font-weight: bold;
-		color: #33cabb;		
-	}
-	.navbar .form-inline {
-        display: inline-block;
-    }
-	.navbar .nav li {
-		position: relative;
-	}
-	.navbar .nav li a {
-		color: #888;
-	}
-	.search-box {
-        position: relative;
-    }	
-    .search-box input {
-        padding-right: 35px;
-		border-color: #dfe3e8;
-        border-radius: 4px !important;
-		box-shadow: none
-    }
-	.search-box .input-group-addon {
-        min-width: 35px;
-        border: none;
-        background: transparent;
-        position: absolute;
-        right: 0;
-        z-index: 9;
-        padding: 7px;
-		height: 100%;
-    }
-    .search-box i {
-        color: #a0a5b1;
-		font-size: 19px;
-    }
-	.navbar .nav .btn-primary, .navbar .nav .btn-primary:active {
-		color: #fff;
-		background: #33cabb;
-		padding-top: 8px;
-		padding-bottom: 6px;
-		vertical-align: middle;
-		border: none;
-	}	
-	.navbar .nav .btn-primary:hover, .navbar .nav .btn-primary:focus {		
-		color: #fff;
-		outline: none;
-		background: #31bfb1;
-	}
-	.navbar .navbar-right li:first-child a {
-		padding-right: 30px;
-	}
-	.navbar ul li i {
-		font-size: 18px;
-	}
-	.navbar .dropdown-menu i {
-		font-size: 16px;
-		min-width: 22px;
-	}
-	.navbar ul.nav li.active a, .navbar ul.nav li.open > a {
-		background: transparent !important;
-	}	
-	.navbar .nav .get-started-btn {
-		min-width: 120px;
-		margin-top: 8px;
-		margin-bottom: 8px;
-	}
-	.navbar ul.nav li.open > a.get-started-btn {
-		color: #fff;
-		background: #31bfb1 !important;
-	}
-	.navbar .dropdown-menu {
-		border-radius: 1px;
-		border-color: #e5e5e5;
-		box-shadow: 0 2px 8px rgba(0,0,0,.05);
-	}
-	.navbar .nav .dropdown-menu li {
-		color: #999;
-		font-weight: normal;
-	}
-	.navbar .nav .dropdown-menu li a, .navbar .nav .dropdown-menu li a:hover, .navbar .nav .dropdown-menu li a:focus {
-		padding: 8px 20px;
-		line-height: normal;
-	}
-	.navbar .navbar-form {
-		border: none;
-	}
-	.navbar .dropdown-menu.form-wrapper {
-		width: 280px;
-		padding: 20px;
-		left: auto;
-		right: 0;
-        font-size: 14px;
-	}
-	.navbar .dropdown-menu.form-wrapper a {		
-		color: #33cabb;
-		padding: 0 !important;
-	}
-	.navbar .dropdown-menu.form-wrapper a:hover{
-		text-decoration: underline;
-	}
-	.navbar .form-wrapper .hint-text {
-		text-align: center;
-		margin-bottom: 15px;
-		font-size: 13px;
-	}
-	.navbar .form-wrapper .social-btn .btn, .navbar .form-wrapper .social-btn .btn:hover {
-		color: #fff;
-        margin: 0;
-		padding: 0 !important;
-		font-size: 13px;
-		border: none;
-		transition: all 0.4s;
-		text-align: center;
-		line-height: 34px;
-		width: 47%;
-		text-decoration: none;
-    }	
-	.navbar .social-btn .btn-primary {
-		background: #507cc0;
-	}
-	.navbar .social-btn .btn-primary:hover {
-		background: #4676bd;
-	}
-	.navbar .social-btn .btn-info {
-		background: #64ccf1;
-	}
-	.navbar .social-btn .btn-info:hover {
-		background: #4ec7ef;
-	}
-	.navbar .social-btn .btn i {
-		margin-right: 5px;
-		font-size: 16px;
-		position: relative;
-		top: 2px;
-	}
-	.navbar .form-wrapper .form-footer {
-		text-align: center;
-		padding-top: 10px;
-		font-size: 13px;
-	}
-	.navbar .form-wrapper .form-footer a:hover{
-		text-decoration: underline;
-	}
-	.navbar .form-wrapper .checkbox-inline input {
-		margin-top: 3px;
-	}
-	.or-seperator {
-        margin-top: 32px;
-		text-align: center;
-		border-top: 1px solid #e0e0e0;
-    }
-    .or-seperator b {
-		color: #666;
-        padding: 0 8px;
-		width: 30px;
-		height: 30px;
-		font-size: 13px;
-		text-align: center;
-		line-height: 26px;
-		background: #fff;
-		display: inline-block;
-		border: 1px solid #e0e0e0;
-		border-radius: 50%;
-		position: relative;
-		top: -15px;
-		z-index: 1;
-    }
-    .navbar .checkbox-inline {
-		font-size: 13px;
-	}
-	.navbar .navbar-right .dropdown-toggle::after {
-		display: none;
-	}
-	@media (min-width: 1200px){
-		.form-inline .input-group {
-			width: 300px;
-			margin-left: 30px;
-		}
-	}
-	@media (max-width: 768px){
-		.navbar .dropdown-menu.form-wrapper {
-			width: 100%;
-			padding: 10px 15px;
-			background: transparent;
-			border: none;
-		}
-		.navbar .form-inline {
-			display: block;
-		}
-		.navbar .input-group {
-			width: 100%;
-		}
-		.navbar .nav .btn-primary, .navbar .nav .btn-primary:active {
-			display: block;
-		}
-	}
+.abs-center {
+  position: absolute;
+  margin: auto;
+  top: 180px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 </style>

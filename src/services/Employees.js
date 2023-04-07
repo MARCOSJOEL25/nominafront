@@ -1,5 +1,5 @@
-export const employees = async () => {
-    const data =  await fetch('http://localhost:5231/api/employees').then(resp => resp.json())
+export const employees = async (page) => {
+    const data =  await fetch(`http://localhost:5231/api/employees?page=${page}&pageSize=3`).then(resp => resp.json())
     return data
 }
 
@@ -99,3 +99,16 @@ export const prestaciones = async (id) => {
 
     return data
 } 
+
+export const search = async (search) => {
+
+  var requestOptions = {
+    method: 'GET',
+    redirect: 'follow'
+  };
+  const data = await fetch(`http://localhost:5231/api/employees/${search}/true`, requestOptions)
+    .then(response => response.json())
+    .catch(error => console.log('error', error));
+
+  return data;
+}

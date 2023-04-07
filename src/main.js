@@ -6,7 +6,8 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import { aliases, fa } from 'vuetify/iconsets/fa'
+import { mdi } from 'vuetify/iconsets/mdi'
 
 import colors from 'vuetify/lib/util/colors'
 
@@ -26,10 +27,11 @@ const vuetify = createVuetify({
           },
         },
       },
-    icons: {
-        defaultSet: 'mdi',
+      icons: {
+        defaultSet: 'fa',
         aliases,
         sets: {
+          fa,
           mdi,
         }
       },

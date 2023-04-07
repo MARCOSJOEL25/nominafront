@@ -24,15 +24,49 @@
     </v-layout>
   </v-card>
   <v-container class="pa-md-3 mx-lg-auto">
+    <v-row>
+      <v-col>
+        <card_count title="Total de Empleados">
+          <template v-slot:contador>
+            <h4>{{ $store.state.total }}</h4>
+          </template>
+        </card_count>
+      </v-col>
+      <v-col>
+        <card_count title="Empleados Activos">
+          <template v-slot:contador>
+            <h4>{{ $store.state.totalActive }}</h4>
+          </template>
+        </card_count>
+      </v-col>
+      <v-col>
+        <card_count title="Empleados Inactivos">
+          <template v-slot:contador>
+            <h4>{{ $store.state.totalInactive }}</h4>
+          </template>
+        </card_count>
+      </v-col>
+    </v-row>
     <v-row class="pa-md-4">
       <v-col>
-        <v-text-field label="Search" hide-details="auto" v-model="searchModel" @change="search"></v-text-field>
+        <v-text-field
+          label="Search"
+          hide-details="auto"
+          v-model="searchModel"
+        ></v-text-field>
       </v-col>
       <v-col>
+        <v-btn color="blue" @click="dialog = !dialog">
+          Agregar nuevo empleado
+        </v-btn>
       </v-col>
       <v-col>
+        <v-btn color="green" @click="dialog = !dialog">
+          Agregar otros ingresos
+        </v-btn>
       </v-col>
       <v-col>
+        <v-btn color="pink" @click="dialog = !dialog"> Pagar </v-btn>
       </v-col>
     </v-row>
     <v-dialog v-model="isLoading" :scrim="false" persistent width="auto">
@@ -47,7 +81,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-table fixed-header height="600px">
+    <v-table fixed-header height="500px">
       <thead>
         <tr>
           <th class="text-center">Nombre Completo</th>
@@ -61,38 +95,66 @@
           <th class="text-center">ISR</th>
           <th class="text-center">Otros.ingresos</th>
           <th class="text-center">Salario neto</th>
+          <th class="text-center">Opciones</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item, index) in employees" :key="index">
+        <tr v-for="(item, index) in $store.state.employees" :key="index">
           <td>{{ item.fullName }}</td>
           <td>{{ item.correo }}</td>
-          <td>{{ item.dataIn }}</td>
+          <td>{{ formatedate(item.dataIn) }}</td>
           <td>{{ item.gender }}</td>
-          <td>{{ item.job }}</td>
-          <td>{{ item.netSalary }}</td>
-          <td>{{ item.afp }}</td>
-          <td>{{ item.ars }}</td>
-          <td>{{ item.isr }}</td>
-          <td>{{ item.adiccion }}</td>
-          <td>{{ item.salaryFinal }}</td>
+          <td>
+            {{ item.job }}
+          </td>
+          <td>
+            <v-btn color="blue" size="small"> {{ "$ " + formato(item.netSalary) }} </v-btn>
+          </td>
+          <td>
+            <v-btn color="red" size="small"> {{ "- $ " + formato(item.afp) }} </v-btn>
+          </td>
+          <td>
+            <v-btn color="red" size="small"> {{ "- $ " + formato(item.ars) }} </v-btn>
+          </td>
+          <td>
+            <v-btn color="red" size="small"> {{ "- $ " + formato(item.isr) }} </v-btn>
+          </td>
+          <td>
+            <v-btn color="green" size="small"> {{ "+ $ " + formato(item.adiccion) }} </v-btn>
+          </td>
+          <td>
+            <v-btn color="blue" size="small"> {{ "$ " + formato(item.salaryFinal) }} </v-btn>
+            
+          </td>
+          <td>
+            <v-btn color="red" size="small" @click="dialog = !dialog"> Despedir </v-btn>
+          </td>
         </tr>
       </tbody>
     </v-table>
+    <div class="text-center">
+        <v-pagination
+          v-model="page"
+          :length="totalPage"
+          prev-icon="mdi-menu-left"
+          next-icon="mdi-menu-right"
+        ></v-pagination>
+      </div>
   </v-container>
 </template>
 <script>
 import { mapActions } from "vuex";
+import card_count from "../components/card.vue";
+
 export default {
   name: "TableEmployee",
-  props: {
-    employeeProp: {
-      type: Array,
-      required: false,
-    },
+  components: {
+    card_count,
   },
   data() {
     return {
+      page:1,
+      totalPage:0,
       searchModel: "",
       employeeModel: {
         id: 0,
@@ -116,11 +178,18 @@ export default {
   },
   async created() {
     await this.renderTable();
+    this.formatedate()
   },
   methods: {
+    formatedate(fecha){
+      var moment = require("moment");
+
+      return moment(fecha, "YYYYMMDD").fromNow()
+    },  
     async renderTable() {
-      await this.getEmployee();
+      await this.getEmployee(this.page);
       this.employees = this.$store.state.employees;
+      this.totalPage = this.$store.state.totalPage;
     },
     ...mapActions([
       "postEmployee",
@@ -128,6 +197,7 @@ export default {
       "getEmployee",
       "extraEmployee",
       "prestaciones",
+      "searchEmployee",
     ]),
     async add() {
       this.isLoading = true;
@@ -154,10 +224,10 @@ export default {
 
       this.isLoading = false;
     },
-    selectEmployee(item) {
-      this.employeeSelected = item;
-      console.log(this.employeeSelected);
-    },
+    // selectEmployee(item) {
+    //   this.employeeSelected = item;
+    //   console.log(this.employeeSelected);
+    // },
     async prestacioness(item) {
       this.selectEmployee(item);
       this.data = await this.prestaciones(item.id);
@@ -166,6 +236,11 @@ export default {
       (this.employeeModel.fullName = ""),
         (this.employeeModel.correo = ""),
         (this.employeeModel.netSalary = 0);
+    },
+    formato(valor) {
+      var numeral = require("numeral");
+
+      return numeral(valor).format("0,0");
     },
     Validar() {
       if (
@@ -185,11 +260,22 @@ export default {
 
       this.isLoading = false;
     },
-    
   },
   watch: {
-    employees(val) {
-      console.log(val);
+    async page(val){
+      this.isLoading = true;
+      await this.getEmployee(val);
+      this.isLoading = false;
+    },
+    employees() {
+      this.isLoading = false;
+    },
+    async searchModel(val) {
+      this.isLoading = true;
+      await this.searchEmployee(val, this.filterActive);
+      if (val == "" || val == null) {
+        await this.renderTable();
+      }
       this.isLoading = false;
     },
   },

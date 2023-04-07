@@ -1,15 +1,30 @@
 import { createStore } from 'vuex'
-import {employees, postAndPut, Delete, login, extra, prestaciones} from '../services/Employees.js'
+import {employees, postAndPut, Delete, login, extra, prestaciones, search} from '../services/Employees.js'
 
 export default createStore({
   state: {
     employees: [],
-    isLogin: false
+    employeesInactive: [],
+    total: 0,
+    totalActive: 0,
+    totalInactive: 0,
+    isLogin: false,
+    totalPage: 0,
+    page: 1,
   },
   getters: {
   },
   mutations: {
     setEmployee(state, payload){
+      state.page = payload.Page
+      state.totalPage = payload.totalPages
+      state.total = payload.total
+      state.totalActive = payload.totalactive
+      state.totalInactive = payload.totalinactive
+      state.employees = payload.active
+      state.employeesInactive = payload.inactive
+    },
+    setListEmployee(state, payload){
       state.employees = payload
     },
     setLogin(state){
@@ -17,8 +32,9 @@ export default createStore({
     }
   },
   actions: {
-    async getEmployee(context){
-      const data = await employees()
+    async getEmployee(context, page){
+      const data = await employees(page)
+      console.log('pagination' ,data)
       context.commit('setEmployee', data)
     },
     async postEmployee(context, payload){
@@ -42,6 +58,11 @@ export default createStore({
     async prestaciones(context, id){
       const resp = await prestaciones(id);
       return resp
+    },
+
+    async searchEmployee(context, searchModel){
+      const resp = await search(searchModel)
+      context.commit('setListEmployee', resp)
     }
   },
 })

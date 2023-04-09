@@ -54,16 +54,19 @@
           hide-details="auto"
           v-model="searchModel"
         ></v-text-field>
+        <v-btn color="yellow" @click="search">Search</v-btn>
       </v-col>
       <v-col>
-        <v-btn color="blue" @click="dialog = !dialog">
+        <v-btn color="blank" data-bs-toggle="modal" data-bs-target="#exampleModal" @click="dialog = !dialog">
           Agregar nuevo empleado
         </v-btn>
+        <createEmployee exampleModal="exampleModal" @render="renderTable"/>
       </v-col>
       <v-col>
-        <v-btn color="green" @click="dialog = !dialog">
+        <v-btn color="blank" data-bs-toggle="modal" data-bs-target="#Extras" @click="dialog = !dialog">
           Agregar otros ingresos
         </v-btn>
+        <extrasEmployee targetId="Extras" />
       </v-col>
       <v-col>
         <v-btn color="pink" @click="dialog = !dialog"> Pagar </v-btn>
@@ -108,59 +111,71 @@
             {{ item.job }}
           </td>
           <td>
-            <v-btn color="blue" size="small"> {{ "$ " + formato(item.netSalary) }} </v-btn>
+            <v-btn color="blue" size="small">
+              {{ "$ " + formato(item.netSalary) }}
+            </v-btn>
           </td>
           <td>
-            <v-btn color="red" size="small"> {{ "- $ " + formato(item.afp) }} </v-btn>
+            <v-btn color="red" size="small">
+              {{ "- $ " + formato(item.afp) }}
+            </v-btn>
           </td>
           <td>
-            <v-btn color="red" size="small"> {{ "- $ " + formato(item.ars) }} </v-btn>
+            <v-btn color="red" size="small">
+              {{ "- $ " + formato(item.ars) }}
+            </v-btn>
           </td>
           <td>
-            <v-btn color="red" size="small"> {{ "- $ " + formato(item.isr) }} </v-btn>
+            <v-btn color="red" size="small">
+              {{ "- $ " + formato(item.isr) }}
+            </v-btn>
           </td>
           <td>
-            <v-btn color="green" size="small"> {{ "+ $ " + formato(item.adiccion) }} </v-btn>
+            <v-btn color="green" size="small">
+              {{ "+ $ " + formato(item.adiccion) }}
+            </v-btn>
           </td>
           <td>
-            <v-btn color="blue" size="small"> {{ "$ " + formato(item.salaryFinal) }} </v-btn>
-            
+            <v-btn color="blue" size="small">
+              {{ "$ " + formato(item.salaryFinal) }}
+            </v-btn>
           </td>
           <td>
-            <v-btn color="red" size="small" @click="dialog = !dialog"> Despedir </v-btn>
+            <v-btn color="red" size="small" @click="dialog = !dialog">
+              Despedir
+            </v-btn>
           </td>
         </tr>
       </tbody>
     </v-table>
     <div class="text-center">
-        <v-pagination
-          v-model="page"
-          :length="totalPage"
-          prev-icon="mdi-menu-left"
-          next-icon="mdi-menu-right"
-        ></v-pagination>
-      </div>
+      <v-pagination
+        v-model="page"
+        :length="totalPage"
+        prev-icon="mdi-menu-left"
+        next-icon="mdi-menu-right"
+      ></v-pagination>
+    </div>
   </v-container>
 </template>
 <script>
 import { mapActions } from "vuex";
 import card_count from "../components/card.vue";
+import createEmployee from "../components/create.vue"
+import extrasEmployee from "../components/extras.vue"
 
 export default {
   name: "TableEmployee",
   components: {
     card_count,
+    createEmployee,
+    extrasEmployee
   },
   data() {
     return {
-      page:1,
-      totalPage:0,
+      page: 1,
+      totalPage: 0,
       searchModel: "",
-      employeeModel: {
-        id: 0,
-        fullName: "",
-        netSalary: 0,
-      },
       employeeid: 0,
       adicciónSalary: 0,
       extrasModel: {
@@ -178,49 +193,35 @@ export default {
   },
   async created() {
     await this.renderTable();
-    this.formatedate()
+    this.formatedate();
   },
   methods: {
-    formatedate(fecha){
+    formatedate(fecha) {
       var moment = require("moment");
 
-      return moment(fecha, "YYYYMMDD").fromNow()
-    },  
+      return moment(fecha, "YYYYMMDD").fromNow();
+    },
     async renderTable() {
+      console.log("se esta renderizando")
       await this.getEmployee(this.page);
       this.employees = this.$store.state.employees;
       this.totalPage = this.$store.state.totalPage;
     },
     ...mapActions([
-      "postEmployee",
       "DeleteEmployee",
       "getEmployee",
       "extraEmployee",
       "prestaciones",
       "searchEmployee",
     ]),
-    async add() {
-      this.isLoading = true;
-
-      if (this.Validar()) {
-        await this.postEmployee(this.employeeModel);
-        await this.renderTable();
-        // this.$emit("Inicializador")
-        this.limpiar();
-        this.isLoading = false;
-      }
-      this.isLoading = false;
-    },
     edit(item) {
       this.postEmployee(item);
-      // this.$emit("Inicializador")
     },
     async Delete(id) {
       this.isLoading = true;
 
       await this.DeleteEmployee(id);
       await this.renderTable();
-      // this.$emit("Inicializador")
 
       this.isLoading = false;
     },
@@ -232,26 +233,19 @@ export default {
       this.selectEmployee(item);
       this.data = await this.prestaciones(item.id);
     },
-    limpiar() {
-      (this.employeeModel.fullName = ""),
-        (this.employeeModel.correo = ""),
-        (this.employeeModel.netSalary = 0);
-    },
     formato(valor) {
       var numeral = require("numeral");
 
       return numeral(valor).format("0,0");
     },
-    Validar() {
-      if (
-        this.employeeModel.fullName == "" ||
-        this.employeeModel.correo == "" ||
-        this.employeeModel.netSalary < 1
-      ) {
-        return false;
-      }
-
-      return true;
+    async search() {
+      if (this.searchModel == "") return;
+      this.isLoading = true;
+      await this.searchEmployee(this.searchModel, this.filterActive);
+      // if (val == "" || val == null) {
+      //   await this.renderTable();
+      // }
+      this.isLoading = false;
     },
     async extras() {
       this.isLoading = true;
@@ -262,7 +256,7 @@ export default {
     },
   },
   watch: {
-    async page(val){
+    async page(val) {
       this.isLoading = true;
       await this.getEmployee(val);
       this.isLoading = false;
@@ -271,12 +265,12 @@ export default {
       this.isLoading = false;
     },
     async searchModel(val) {
-      this.isLoading = true;
-      await this.searchEmployee(val, this.filterActive);
       if (val == "" || val == null) {
+        this.isLoading = true;
         await this.renderTable();
+        this.isLoading = false;
+        this.page = 1;
       }
-      this.isLoading = false;
     },
   },
 };

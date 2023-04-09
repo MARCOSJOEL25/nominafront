@@ -1,5 +1,5 @@
 export const employees = async (page) => {
-    const data =  await fetch(`http://localhost:5231/api/employees?page=${page}&pageSize=3`).then(resp => resp.json())
+    const data =  await fetch(`http://localhost:5231/api/employees?page=${page}&pageSize=8`).then(resp => resp.json())
     return data
 }
 

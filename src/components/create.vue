@@ -87,7 +87,7 @@
 <script>
 import { mapActions } from "vuex";
 export default {
-  name: "createEmployee",
+  name: "deleteEmployee",
   props: {
     exampleModal: String,
   },

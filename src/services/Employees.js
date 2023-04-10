@@ -40,14 +40,14 @@ export const Delete = async(id) => {
       console.log(rel)
 }
 
-export const extra = async ( id, extras ) =>{
+export const extra = async ( extrasModel ) =>{
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 
   var raw = JSON.stringify({
     "id": 0,
-    "employeeId": id,
-    "adicciónSalary": extras,
+    "employeeId": extrasModel.employeeId,
+    "adicciónSalary": extrasModel.adicciónSalary,
     "motivo": "string"
   });
 

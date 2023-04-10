@@ -66,7 +66,7 @@
         <v-btn color="blank" data-bs-toggle="modal" data-bs-target="#Extras" @click="dialog = !dialog">
           Agregar otros ingresos
         </v-btn>
-        <extrasEmployee targetId="Extras" />
+        <extrasEmployee targetId="Extras" @renderTable="renderTable"/>
       </v-col>
       <v-col>
         <v-btn color="pink" @click="dialog = !dialog"> Pagar </v-btn>
@@ -141,9 +141,10 @@
             </v-btn>
           </td>
           <td>
-            <v-btn color="red" size="small" @click="dialog = !dialog">
+            <v-btn size="small" color="black" data-bs-toggle="modal" data-bs-target="#despedirModal" @click="dialog = !dialog">
               Despedir
             </v-btn>
+            <despedirEmployee targetId="despedirModal" :id="item.id" @click="renderTable"/>
           </td>
         </tr>
       </tbody>
@@ -163,13 +164,15 @@ import { mapActions } from "vuex";
 import card_count from "../components/card.vue";
 import createEmployee from "../components/create.vue"
 import extrasEmployee from "../components/extras.vue"
+import despedirEmployee from "../components/despedir.vue" 
 
 export default {
   name: "TableEmployee",
   components: {
     card_count,
     createEmployee,
-    extrasEmployee
+    extrasEmployee,
+    despedirEmployee
   },
   data() {
     return {
@@ -202,30 +205,19 @@ export default {
       return moment(fecha, "YYYYMMDD").fromNow();
     },
     async renderTable() {
-      console.log("se esta renderizando")
       await this.getEmployee(this.page);
       this.employees = this.$store.state.employees;
       this.totalPage = this.$store.state.totalPage;
     },
     ...mapActions([
-      "DeleteEmployee",
       "getEmployee",
-      "extraEmployee",
-      "prestaciones",
       "searchEmployee",
     ]),
     edit(item) {
       this.postEmployee(item);
     },
-    async Delete(id) {
-      this.isLoading = true;
-
-      await this.DeleteEmployee(id);
-      await this.renderTable();
-
-      this.isLoading = false;
-    },
-    // selectEmployee(item) {
+    
+    // /(item) {
     //   this.employeeSelected = item;
     //   console.log(this.employeeSelected);
     // },
@@ -245,13 +237,6 @@ export default {
       // if (val == "" || val == null) {
       //   await this.renderTable();
       // }
-      this.isLoading = false;
-    },
-    async extras() {
-      this.isLoading = true;
-      await this.extraEmployee(this.employeeid, this.adicciónSalary);
-      await this.renderTable();
-
       this.isLoading = false;
     },
   },

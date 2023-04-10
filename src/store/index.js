@@ -51,8 +51,9 @@ export default createStore({
       } 
         return false
     },
-    async extraEmployee(context, id, extras){
-      const resp = await extra(id, extras);
+    async extraEmployee(context, extrasModel){
+      console.log("desde vuex", extrasModel)
+      const resp = await extra(extrasModel);
       console.log('respuesta de la peticion', resp)
     },
     async prestaciones(context, id){

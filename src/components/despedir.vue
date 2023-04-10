@@ -10,7 +10,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Extras</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Prestaciones</h5>
           <button
             type="button"
             class="btn-close"
@@ -19,30 +19,40 @@
           ></button>
         </div>
         <div class="modal-body">
-            <label for="exampleFormControlInput1" class="form-label"
-              >Empleado elegido</label>
-          <select class="form-select" aria-label="Default select example" v-model="extrasModel.employeeId">
-            <option v-for="(item, index) in $store.state.employees" :key="index" :value="item.id">{{ item.fullName }}</option>
-          </select>
           <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label"
-              >Cantidad</label
+              >Tiempo en la empresa</label
             >
             <input
-              type="Number"
-              v-model="extrasModel.adicciónSalary"
+              type="Text"
               class="form-control"
+              v-model="data.tiempoEmpresa"
               id="exampleFormControlInput1"
+              :disabled="true"
             />
           </div>
           <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label"
-              >Motivo</label
+              >Regalia</label
             >
             <input
               type="text"
               class="form-control"
+              v-model="data.prestacionesTotales"
               id="exampleFormControlInput1"
+              :disabled="true"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label"
+              >Salario del empleado</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              v-model="data.salarioDelEmpleado"
+              id="exampleFormControlInput1"
+              :disabled="true"
             />
           </div>
         </div>
@@ -55,38 +65,50 @@
           >
             Close
           </v-btn>
-          <v-btn type="button" class="btn btn-primary" @click="extras">Guardar cambios</v-btn>
+          <v-btn type="button" class="btn btn-primary" @click="Delete"
+            >Guardar cambios</v-btn
+          >
         </div>
       </div>
     </div>
   </div>
 </template>
-<script>
-import { mapActions } from 'vuex';
+  <script>
+import { mapActions } from "vuex";
 export default {
-  name: "extrasEmployee",
+  name: "despedirEmployee",
   props: {
     targetId: String,
+    id: Number,
   },
   data() {
     return {
-      extrasModel:{
-        employeeId: 0,
-        adicciónSalary: 0,
-      }
+      data: [],
     };
   },
-  methods:{
-    ...mapActions(["extraEmployee"]),
-    async extras() {
-      console.log(this.extrasModel)
+  async created(){
+    this.data = await this.prestaciones(this.id);
+    this.data.salarioDelEmpleado = this.formato(this.data.salarioDelEmpleado)
+    this.data.prestacionesTotales = this.formato(this.data.prestacionesTotales)
+  },
+  methods: {
+    ...mapActions(["DeleteEmployee", "prestaciones"]),
+    async Delete() {
+      console.log(this.id);
       this.isLoading = true;
-      await this.extraEmployee(this.extrasModel);
+
+      await this.prestacioness();
+      await this.DeleteEmployee(this.id);
 
       this.isLoading = false;
     },
-  }
+    formato(valor) {
+      var numeral = require("numeral");
+
+      return numeral(valor).format("0,0");
+    },
+  },
 };
 </script>
-<style>
+  <style>
 </style>
